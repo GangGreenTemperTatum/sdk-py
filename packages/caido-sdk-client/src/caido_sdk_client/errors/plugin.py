@@ -93,6 +93,9 @@ class PluginUserError(BaseError):
                     "This operation cannot be performed on this type of plugin"
                 )
                 self.reason = error.reason
+            case _:
+                super().__init__(f"Plugin error: {error.reason}")
+                self.reason = error.reason
 
 
 class StoreUserError(BaseError):
@@ -110,3 +113,5 @@ class StoreUserError(BaseError):
                 super().__init__(
                     "An unknown error occured while installing the plugin package"
                 )
+            case _:
+                super().__init__(f"Store error: {error.storeReason}")

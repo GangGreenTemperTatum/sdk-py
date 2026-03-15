@@ -28,3 +28,6 @@ class ProjectUserError(BaseError):
                     "The project was created with a newer version of Caido."
                 )
                 self.reason = reason
+            case _:
+                super().__init__(f"Project error: {reason}")
+                self.reason = reason

@@ -40,9 +40,11 @@ def to_user_error(
 
     if code == _ERROR_CODE_AUTHORIZATION:
         reason = caido_extension.get("reason")
-        if isinstance(reason, str) and reason in _VALID_AUTHORIZATION_REASONS:
+        if isinstance(reason, str):
+            if reason in _VALID_AUTHORIZATION_REASONS:
+                return AuthorizationUserError({"reason": reason})
             return AuthorizationUserError({"reason": reason})
-        return None
+        return OtherUserError(code, "Authorization error with missing reason")
 
     if code == _ERROR_CODE_CLOUD:
         reason = caido_extension.get("reason")
@@ -52,13 +54,13 @@ def to_user_error(
                 code=code,
             )
             return CloudUserError(fragment)
-        return None
+        return OtherUserError(code, f"Cloud error: {reason}")
 
     if code == _ERROR_CODE_INTERNAL:
         message = caido_extension.get("message")
         if isinstance(message, str):
             return OtherUserError(code, message)
-        return None
+        return OtherUserError(code, "Internal error")
 
     return None
 
