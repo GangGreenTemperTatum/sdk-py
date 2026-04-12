@@ -43,7 +43,7 @@ class GraphQLClient:
         self._graphql_url = f"{normalized_url}/graphql"
         self._websocket_url = self._to_websocket_url(normalized_url)
         self._static_headers = dict(headers) if headers is not None else {}
-        self._timeout_seconds = timeout_ms / 1000 if timeout_ms is not None else 30
+        self._timeout_seconds = int(timeout_ms / 1000) if timeout_ms is not None else 30
         self._auth = auth
 
         self._http_transport, self._http_client = self._create_http_client()

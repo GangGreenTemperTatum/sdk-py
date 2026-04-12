@@ -1,7 +1,9 @@
-"""Pytest configuration and fixtures for SDK client integration tests.
+"""Pytest fixtures for integration tests under tests/.
 
-Requires a running Caido instance. Set CAIDO_INSTANCE_URL (default http://localhost:8080)
-and CAIDO_PAT (required).
+Unit tests live next to source under src/caido_sdk_client/**/tests/.
+
+Integration tests require a running Caido instance: set CAIDO_INSTANCE_URL
+(default http://localhost:8080) and CAIDO_PAT (required).
 """
 
 from __future__ import annotations
