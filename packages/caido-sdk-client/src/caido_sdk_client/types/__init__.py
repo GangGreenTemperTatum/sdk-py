@@ -12,6 +12,7 @@ from .environment import (
 )
 from .filter import (
     CreateFilterPresetOptions,
+    FilterClauseKind,
     FilterPreset,
     UpdateFilterPresetOptions,
 )
@@ -102,6 +103,7 @@ __all__ = [
     "Id",
     "IdLike",
     "CreateFilterPresetOptions",
+    "FilterClauseKind",
     "CreateFindingOptions",
     "CreateProjectOptions",
     "Edge",

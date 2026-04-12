@@ -186,7 +186,7 @@ class CreateFilterPresetInput(Model):
     """No documentation"""
 
     alias: str
-    clause: str
+    clause: "QueryInput"
     name: str
 
 
@@ -262,6 +262,12 @@ class FindingOrderInput(Model):
     ordering: Ordering
 
 
+class HTTPQLInput(Model):
+    """No documentation"""
+
+    code: str
+
+
 class InstallPluginPackageInput(Model):
     """No documentation"""
 
@@ -275,6 +281,13 @@ class PluginPackageSource(Model):
     file: Optional[FileVar] = None
     manifestId: Optional[str] = None
     url: Optional[str] = None
+
+
+class QueryInput(Model):
+    """No documentation"""
+
+    HTTPQL: Optional[HTTPQLInput] = None
+    streamQL: Optional["StreamQLInput"] = None
 
 
 class RangeInput(Model):
@@ -405,6 +418,12 @@ class StartReplayTaskInput(Model):
     settings: ReplayEntrySettingsInput
 
 
+class StreamQLInput(Model):
+    """No documentation"""
+
+    code: str
+
+
 class UpdateEnvironmentInput(Model):
     """No documentation"""
 
@@ -417,7 +436,7 @@ class UpdateFilterPresetInput(Model):
     """No documentation"""
 
     alias: str
-    clause: str
+    clause: QueryInput
     name: str
 
 
@@ -725,6 +744,42 @@ class UserErrorFullWorkflowUserError(UserErrorFullBase, Model):
     )
 
 
+class HTTPQLQueryFull(Model):
+    """No documentation"""
+
+    typename: Literal["HTTPQL"] = Field(alias="__typename", default="HTTPQL")
+    code: str
+
+    class Meta:
+        """Meta class for HTTPQLQueryFull"""
+
+        document = "fragment HTTPQLQueryFull on HTTPQL {\n  __typename\n  code\n}"
+        name = "HTTPQLQueryFull"
+        type = "HTTPQL"
+
+
+class StreamQLQueryFull(Model):
+    """No documentation"""
+
+    typename: Literal["StreamQL"] = Field(alias="__typename", default="StreamQL")
+    code: str
+
+    class Meta:
+        """Meta class for StreamQLQueryFull"""
+
+        document = "fragment StreamQLQueryFull on StreamQL {\n  __typename\n  code\n}"
+        name = "StreamQLQueryFull"
+        type = "StreamQL"
+
+
+class FilterPresetFullHTTPQLInlineFragment(HTTPQLQueryFull, Model):
+    pass
+
+
+class FilterPresetFullStreamQLInlineFragment(StreamQLQueryFull, Model):
+    pass
+
+
 class FilterPresetFull(Model):
     """No documentation"""
 
@@ -734,12 +789,14 @@ class FilterPresetFull(Model):
     id: str
     name: str
     alias: str
-    clause: str
+    clause: Union[
+        FilterPresetFullHTTPQLInlineFragment, FilterPresetFullStreamQLInlineFragment
+    ]
 
     class Meta:
         """Meta class for FilterPresetFull"""
 
-        document = "fragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause\n  __typename\n}"
+        document = "fragment HTTPQLQueryFull on HTTPQL {\n  __typename\n  code\n}\n\nfragment StreamQLQueryFull on StreamQL {\n  __typename\n  code\n}\n\nfragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause {\n    ... on HTTPQL {\n      ...HTTPQLQueryFull\n    }\n    ... on StreamQL {\n      ...StreamQLQueryFull\n    }\n    __typename\n  }\n  __typename\n}"
         name = "FilterPresetFull"
         type = "FilterPreset"
 
@@ -1047,34 +1104,34 @@ class ReplayEnvironmentPreprocessorFull(Model):
         type = "ReplayEnvironmentPreprocessor"
 
 
-class ReplayPreprocessorFullReplayPrefixPreprocessorInlineFragment(Model):
-    typename: Literal["ReplayPrefixPreprocessor"] = Field(
-        alias="__typename", default="ReplayPrefixPreprocessor"
-    )
+class ReplayPreprocessorFullReplayPrefixPreprocessorInlineFragment(
+    ReplayPrefixPreprocessorFull, Model
+):
+    pass
 
 
-class ReplayPreprocessorFullReplaySuffixPreprocessorInlineFragment(Model):
-    typename: Literal["ReplaySuffixPreprocessor"] = Field(
-        alias="__typename", default="ReplaySuffixPreprocessor"
-    )
+class ReplayPreprocessorFullReplaySuffixPreprocessorInlineFragment(
+    ReplaySuffixPreprocessorFull, Model
+):
+    pass
 
 
-class ReplayPreprocessorFullReplayUrlEncodePreprocessorInlineFragment(Model):
-    typename: Literal["ReplayUrlEncodePreprocessor"] = Field(
-        alias="__typename", default="ReplayUrlEncodePreprocessor"
-    )
+class ReplayPreprocessorFullReplayUrlEncodePreprocessorInlineFragment(
+    ReplayUrlEncodePreprocessorFull, Model
+):
+    pass
 
 
-class ReplayPreprocessorFullReplayWorkflowPreprocessorInlineFragment(Model):
-    typename: Literal["ReplayWorkflowPreprocessor"] = Field(
-        alias="__typename", default="ReplayWorkflowPreprocessor"
-    )
+class ReplayPreprocessorFullReplayWorkflowPreprocessorInlineFragment(
+    ReplayWorkflowPreprocessorFull, Model
+):
+    pass
 
 
-class ReplayPreprocessorFullReplayEnvironmentPreprocessorInlineFragment(Model):
-    typename: Literal["ReplayEnvironmentPreprocessor"] = Field(
-        alias="__typename", default="ReplayEnvironmentPreprocessor"
-    )
+class ReplayPreprocessorFullReplayEnvironmentPreprocessorInlineFragment(
+    ReplayEnvironmentPreprocessorFull, Model
+):
+    pass
 
 
 class ReplayPreprocessorFull(Model):
@@ -1209,6 +1266,14 @@ class TaskMetaDataExportTask(TaskMetaBase, Model):
 
     typename: Literal["DataExportTask"] = Field(
         alias="__typename", default="DataExportTask"
+    )
+
+
+class TaskMetaDeleteStreamWsMessageTask(TaskMetaBase, Model):
+    """No documentation"""
+
+    typename: Literal["DeleteStreamWsMessageTask"] = Field(
+        alias="__typename", default="DeleteStreamWsMessageTask"
     )
 
 
@@ -1681,28 +1746,28 @@ class EnvironmentQuery(Model):
         document = "fragment EnvironmentFull on Environment {\n  id\n  name\n  variables {\n    name\n    value\n    kind\n    __typename\n  }\n  version\n  __typename\n}\n\nquery EnvironmentQuery($id: ID!) {\n  environment(id: $id) {\n    ...EnvironmentFull\n    __typename\n  }\n}"
 
 
-class CreateEnvironmentCreateenvironmentNameTakenUserErrorInlineFragment(Model):
-    typename: Literal["NameTakenUserError"] = Field(
-        alias="__typename", default="NameTakenUserError"
-    )
+class CreateEnvironmentCreateenvironmentNameTakenUserErrorInlineFragment(
+    NameTakenUserErrorFull, Model
+):
+    pass
 
 
-class CreateEnvironmentCreateenvironmentPermissionDeniedUserErrorInlineFragment(Model):
-    typename: Literal["PermissionDeniedUserError"] = Field(
-        alias="__typename", default="PermissionDeniedUserError"
-    )
+class CreateEnvironmentCreateenvironmentPermissionDeniedUserErrorInlineFragment(
+    PermissionDeniedUserErrorFull, Model
+):
+    pass
 
 
-class CreateEnvironmentCreateenvironmentCloudUserErrorInlineFragment(Model):
-    typename: Literal["CloudUserError"] = Field(
-        alias="__typename", default="CloudUserError"
-    )
+class CreateEnvironmentCreateenvironmentCloudUserErrorInlineFragment(
+    CloudUserErrorFull, Model
+):
+    pass
 
 
-class CreateEnvironmentCreateenvironmentOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class CreateEnvironmentCreateenvironmentOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class CreateEnvironmentCreateenvironment(Model):
@@ -1739,34 +1804,34 @@ class CreateEnvironment(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment CloudUserErrorFull on CloudUserError {\n  ...UserErrorFull\n  cloudReason: reason\n  __typename\n}\n\nfragment EnvironmentFull on Environment {\n  id\n  name\n  variables {\n    name\n    value\n    kind\n    __typename\n  }\n  version\n  __typename\n}\n\nfragment NameTakenUserErrorFull on NameTakenUserError {\n  ...UserErrorFull\n  name\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment PermissionDeniedUserErrorFull on PermissionDeniedUserError {\n  ...UserErrorFull\n  permissionReason: reason\n  __typename\n}\n\nmutation CreateEnvironment($input: CreateEnvironmentInput!) {\n  createEnvironment(input: $input) {\n    error {\n      __typename\n      ... on NameTakenUserError {\n        ...NameTakenUserErrorFull\n      }\n      ... on PermissionDeniedUserError {\n        ...PermissionDeniedUserErrorFull\n      }\n      ... on CloudUserError {\n        ...CloudUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    environment {\n      ...EnvironmentFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class UpdateEnvironmentUpdateenvironmentUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class UpdateEnvironmentUpdateenvironmentUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class UpdateEnvironmentUpdateenvironmentNameTakenUserErrorInlineFragment(Model):
-    typename: Literal["NameTakenUserError"] = Field(
-        alias="__typename", default="NameTakenUserError"
-    )
+class UpdateEnvironmentUpdateenvironmentNameTakenUserErrorInlineFragment(
+    NameTakenUserErrorFull, Model
+):
+    pass
 
 
-class UpdateEnvironmentUpdateenvironmentNewerVersionUserErrorInlineFragment(Model):
-    typename: Literal["NewerVersionUserError"] = Field(
-        alias="__typename", default="NewerVersionUserError"
-    )
+class UpdateEnvironmentUpdateenvironmentNewerVersionUserErrorInlineFragment(
+    NewerVersionUserErrorFull, Model
+):
+    pass
 
 
-class UpdateEnvironmentUpdateenvironmentPermissionDeniedUserErrorInlineFragment(Model):
-    typename: Literal["PermissionDeniedUserError"] = Field(
-        alias="__typename", default="PermissionDeniedUserError"
-    )
+class UpdateEnvironmentUpdateenvironmentPermissionDeniedUserErrorInlineFragment(
+    PermissionDeniedUserErrorFull, Model
+):
+    pass
 
 
-class UpdateEnvironmentUpdateenvironmentOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class UpdateEnvironmentUpdateenvironmentOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class UpdateEnvironmentUpdateenvironment(Model):
@@ -1805,16 +1870,16 @@ class UpdateEnvironment(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment EnvironmentFull on Environment {\n  id\n  name\n  variables {\n    name\n    value\n    kind\n    __typename\n  }\n  version\n  __typename\n}\n\nfragment NameTakenUserErrorFull on NameTakenUserError {\n  ...UserErrorFull\n  name\n  __typename\n}\n\nfragment NewerVersionUserErrorFull on NewerVersionUserError {\n  ...UserErrorFull\n  version\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment PermissionDeniedUserErrorFull on PermissionDeniedUserError {\n  ...UserErrorFull\n  permissionReason: reason\n  __typename\n}\n\nfragment UnknownIdUserErrorFull on UnknownIdUserError {\n  ...UserErrorFull\n  id\n  __typename\n}\n\nmutation UpdateEnvironment($id: ID!, $input: UpdateEnvironmentInput!) {\n  updateEnvironment(id: $id, input: $input) {\n    error {\n      __typename\n      ... on UnknownIdUserError {\n        ...UnknownIdUserErrorFull\n      }\n      ... on NameTakenUserError {\n        ...NameTakenUserErrorFull\n      }\n      ... on NewerVersionUserError {\n        ...NewerVersionUserErrorFull\n      }\n      ... on PermissionDeniedUserError {\n        ...PermissionDeniedUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    environment {\n      ...EnvironmentFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class DeleteEnvironmentDeleteenvironmentUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class DeleteEnvironmentDeleteenvironmentUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class DeleteEnvironmentDeleteenvironmentOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class DeleteEnvironmentDeleteenvironmentOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class DeleteEnvironmentDeleteenvironment(Model):
@@ -1849,16 +1914,16 @@ class DeleteEnvironment(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment UnknownIdUserErrorFull on UnknownIdUserError {\n  ...UserErrorFull\n  id\n  __typename\n}\n\nmutation DeleteEnvironment($id: ID!) {\n  deleteEnvironment(id: $id) {\n    deletedId\n    error {\n      __typename\n      ... on UnknownIdUserError {\n        ...UnknownIdUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    __typename\n  }\n}"
 
 
-class SelectEnvironmentSelectenvironmentUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class SelectEnvironmentSelectenvironmentUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class SelectEnvironmentSelectenvironmentOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class SelectEnvironmentSelectenvironmentOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class SelectEnvironmentSelectenvironmentEnvironmentVariables(Model):
@@ -1929,7 +1994,7 @@ class FilterPresets(Model):
     class Meta:
         """Meta class for FilterPresets"""
 
-        document = "fragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause\n  __typename\n}\n\nquery FilterPresets {\n  filterPresets {\n    ...FilterPresetFull\n    __typename\n  }\n}"
+        document = "fragment HTTPQLQueryFull on HTTPQL {\n  __typename\n  code\n}\n\nfragment StreamQLQueryFull on StreamQL {\n  __typename\n  code\n}\n\nfragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause {\n    ... on HTTPQL {\n      ...HTTPQLQueryFull\n    }\n    ... on StreamQL {\n      ...StreamQLQueryFull\n    }\n    __typename\n  }\n  __typename\n}\n\nquery FilterPresets {\n  filterPresets {\n    ...FilterPresetFull\n    __typename\n  }\n}"
 
 
 class FilterPreset(Model):
@@ -1946,39 +2011,37 @@ class FilterPreset(Model):
     class Meta:
         """Meta class for FilterPreset"""
 
-        document = "fragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause\n  __typename\n}\n\nquery FilterPreset($id: ID!) {\n  filterPreset(id: $id) {\n    ...FilterPresetFull\n    __typename\n  }\n}"
+        document = "fragment HTTPQLQueryFull on HTTPQL {\n  __typename\n  code\n}\n\nfragment StreamQLQueryFull on StreamQL {\n  __typename\n  code\n}\n\nfragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause {\n    ... on HTTPQL {\n      ...HTTPQLQueryFull\n    }\n    ... on StreamQL {\n      ...StreamQLQueryFull\n    }\n    __typename\n  }\n  __typename\n}\n\nquery FilterPreset($id: ID!) {\n  filterPreset(id: $id) {\n    ...FilterPresetFull\n    __typename\n  }\n}"
 
 
-class CreateFilterPresetCreatefilterpresetNameTakenUserErrorInlineFragment(Model):
-    typename: Literal["NameTakenUserError"] = Field(
-        alias="__typename", default="NameTakenUserError"
-    )
+class CreateFilterPresetCreatefilterpresetNameTakenUserErrorInlineFragment(
+    NameTakenUserErrorFull, Model
+):
+    pass
 
 
-class CreateFilterPresetCreatefilterpresetAliasTakenUserErrorInlineFragment(Model):
-    typename: Literal["AliasTakenUserError"] = Field(
-        alias="__typename", default="AliasTakenUserError"
-    )
+class CreateFilterPresetCreatefilterpresetAliasTakenUserErrorInlineFragment(
+    AliasTakenUserErrorFull, Model
+):
+    pass
 
 
 class CreateFilterPresetCreatefilterpresetPermissionDeniedUserErrorInlineFragment(
-    Model
+    PermissionDeniedUserErrorFull, Model
 ):
-    typename: Literal["PermissionDeniedUserError"] = Field(
-        alias="__typename", default="PermissionDeniedUserError"
-    )
+    pass
 
 
-class CreateFilterPresetCreatefilterpresetCloudUserErrorInlineFragment(Model):
-    typename: Literal["CloudUserError"] = Field(
-        alias="__typename", default="CloudUserError"
-    )
+class CreateFilterPresetCreatefilterpresetCloudUserErrorInlineFragment(
+    CloudUserErrorFull, Model
+):
+    pass
 
 
-class CreateFilterPresetCreatefilterpresetOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class CreateFilterPresetCreatefilterpresetOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class CreateFilterPresetCreatefilterpreset(Model):
@@ -2013,25 +2076,25 @@ class CreateFilterPreset(Model):
     class Meta:
         """Meta class for CreateFilterPreset"""
 
-        document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment AliasTakenUserErrorFull on AliasTakenUserError {\n  ...UserErrorFull\n  alias\n  __typename\n}\n\nfragment CloudUserErrorFull on CloudUserError {\n  ...UserErrorFull\n  cloudReason: reason\n  __typename\n}\n\nfragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause\n  __typename\n}\n\nfragment NameTakenUserErrorFull on NameTakenUserError {\n  ...UserErrorFull\n  name\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment PermissionDeniedUserErrorFull on PermissionDeniedUserError {\n  ...UserErrorFull\n  permissionReason: reason\n  __typename\n}\n\nmutation CreateFilterPreset($input: CreateFilterPresetInput!) {\n  createFilterPreset(input: $input) {\n    error {\n      __typename\n      ... on NameTakenUserError {\n        ...NameTakenUserErrorFull\n      }\n      ... on AliasTakenUserError {\n        ...AliasTakenUserErrorFull\n      }\n      ... on PermissionDeniedUserError {\n        ...PermissionDeniedUserErrorFull\n      }\n      ... on CloudUserError {\n        ...CloudUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    filter {\n      ...FilterPresetFull\n      __typename\n    }\n    __typename\n  }\n}"
+        document = "fragment HTTPQLQueryFull on HTTPQL {\n  __typename\n  code\n}\n\nfragment StreamQLQueryFull on StreamQL {\n  __typename\n  code\n}\n\nfragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment AliasTakenUserErrorFull on AliasTakenUserError {\n  ...UserErrorFull\n  alias\n  __typename\n}\n\nfragment CloudUserErrorFull on CloudUserError {\n  ...UserErrorFull\n  cloudReason: reason\n  __typename\n}\n\nfragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause {\n    ... on HTTPQL {\n      ...HTTPQLQueryFull\n    }\n    ... on StreamQL {\n      ...StreamQLQueryFull\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment NameTakenUserErrorFull on NameTakenUserError {\n  ...UserErrorFull\n  name\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment PermissionDeniedUserErrorFull on PermissionDeniedUserError {\n  ...UserErrorFull\n  permissionReason: reason\n  __typename\n}\n\nmutation CreateFilterPreset($input: CreateFilterPresetInput!) {\n  createFilterPreset(input: $input) {\n    error {\n      __typename\n      ... on NameTakenUserError {\n        ...NameTakenUserErrorFull\n      }\n      ... on AliasTakenUserError {\n        ...AliasTakenUserErrorFull\n      }\n      ... on PermissionDeniedUserError {\n        ...PermissionDeniedUserErrorFull\n      }\n      ... on CloudUserError {\n        ...CloudUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    filter {\n      ...FilterPresetFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class UpdateFilterPresetUpdatefilterpresetNameTakenUserErrorInlineFragment(Model):
-    typename: Literal["NameTakenUserError"] = Field(
-        alias="__typename", default="NameTakenUserError"
-    )
+class UpdateFilterPresetUpdatefilterpresetNameTakenUserErrorInlineFragment(
+    NameTakenUserErrorFull, Model
+):
+    pass
 
 
-class UpdateFilterPresetUpdatefilterpresetAliasTakenUserErrorInlineFragment(Model):
-    typename: Literal["AliasTakenUserError"] = Field(
-        alias="__typename", default="AliasTakenUserError"
-    )
+class UpdateFilterPresetUpdatefilterpresetAliasTakenUserErrorInlineFragment(
+    AliasTakenUserErrorFull, Model
+):
+    pass
 
 
-class UpdateFilterPresetUpdatefilterpresetOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class UpdateFilterPresetUpdatefilterpresetOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class UpdateFilterPresetUpdatefilterpreset(Model):
@@ -2065,7 +2128,7 @@ class UpdateFilterPreset(Model):
     class Meta:
         """Meta class for UpdateFilterPreset"""
 
-        document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment AliasTakenUserErrorFull on AliasTakenUserError {\n  ...UserErrorFull\n  alias\n  __typename\n}\n\nfragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause\n  __typename\n}\n\nfragment NameTakenUserErrorFull on NameTakenUserError {\n  ...UserErrorFull\n  name\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nmutation UpdateFilterPreset($id: ID!, $input: UpdateFilterPresetInput!) {\n  updateFilterPreset(id: $id, input: $input) {\n    error {\n      __typename\n      ... on NameTakenUserError {\n        ...NameTakenUserErrorFull\n      }\n      ... on AliasTakenUserError {\n        ...AliasTakenUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    filter {\n      ...FilterPresetFull\n      __typename\n    }\n    __typename\n  }\n}"
+        document = "fragment HTTPQLQueryFull on HTTPQL {\n  __typename\n  code\n}\n\nfragment StreamQLQueryFull on StreamQL {\n  __typename\n  code\n}\n\nfragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment AliasTakenUserErrorFull on AliasTakenUserError {\n  ...UserErrorFull\n  alias\n  __typename\n}\n\nfragment FilterPresetFull on FilterPreset {\n  id\n  name\n  alias\n  clause {\n    ... on HTTPQL {\n      ...HTTPQLQueryFull\n    }\n    ... on StreamQL {\n      ...StreamQLQueryFull\n    }\n    __typename\n  }\n  __typename\n}\n\nfragment NameTakenUserErrorFull on NameTakenUserError {\n  ...UserErrorFull\n  name\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nmutation UpdateFilterPreset($id: ID!, $input: UpdateFilterPresetInput!) {\n  updateFilterPreset(id: $id, input: $input) {\n    error {\n      __typename\n      ... on NameTakenUserError {\n        ...NameTakenUserErrorFull\n      }\n      ... on AliasTakenUserError {\n        ...AliasTakenUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    filter {\n      ...FilterPresetFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
 class DeleteFilterPresetDeletefilterpreset(Model):
@@ -2169,16 +2232,14 @@ class Findings(Model):
         document = "fragment FindingFull on Finding {\n  id\n  request {\n    id\n    __typename\n  }\n  title\n  reporter\n  description\n  dedupeKey\n  host\n  path\n  hidden\n  createdAt\n  __typename\n}\n\nquery Findings($first: Int, $after: String, $last: Int, $before: String, $filter: FilterClauseFindingInput, $order: FindingOrderInput) {\n  findings(\n    first: $first\n    after: $after\n    last: $last\n    before: $before\n    filter: $filter\n    order: $order\n  ) {\n    edges {\n      cursor\n      node {\n        ...FindingFull\n        __typename\n      }\n      __typename\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class CreateFindingCreatefindingOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class CreateFindingCreatefindingOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
-class CreateFindingCreatefindingUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class CreateFindingCreatefindingUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
 class CreateFindingCreatefinding(Model):
@@ -2214,16 +2275,14 @@ class CreateFinding(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment FindingFull on Finding {\n  id\n  request {\n    id\n    __typename\n  }\n  title\n  reporter\n  description\n  dedupeKey\n  host\n  path\n  hidden\n  createdAt\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment UnknownIdUserErrorFull on UnknownIdUserError {\n  ...UserErrorFull\n  id\n  __typename\n}\n\nmutation CreateFinding($requestId: ID!, $input: CreateFindingInput!) {\n  createFinding(requestId: $requestId, input: $input) {\n    error {\n      __typename\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n      ... on UnknownIdUserError {\n        ...UnknownIdUserErrorFull\n      }\n    }\n    finding {\n      ...FindingFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class UpdateFindingUpdatefindingUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class UpdateFindingUpdatefindingUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class UpdateFindingUpdatefindingOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class UpdateFindingUpdatefindingOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
 class UpdateFindingUpdatefinding(Model):
@@ -2438,28 +2497,28 @@ class PluginPackages(Model):
         document = "fragment PluginPackageMeta on PluginPackage {\n  id\n  manifestId\n  plugins {\n    __typename\n    id\n    manifestId\n    enabled\n  }\n  __typename\n}\n\nquery PluginPackages {\n  pluginPackages {\n    ...PluginPackageMeta\n    __typename\n  }\n}"
 
 
-class InstallPluginPackageInstallpluginpackagePluginUserErrorInlineFragment(Model):
-    typename: Literal["PluginUserError"] = Field(
-        alias="__typename", default="PluginUserError"
-    )
+class InstallPluginPackageInstallpluginpackagePluginUserErrorInlineFragment(
+    PluginUserErrorFull, Model
+):
+    pass
 
 
-class InstallPluginPackageInstallpluginpackageStoreUserErrorInlineFragment(Model):
-    typename: Literal["StoreUserError"] = Field(
-        alias="__typename", default="StoreUserError"
-    )
+class InstallPluginPackageInstallpluginpackageStoreUserErrorInlineFragment(
+    StoreUserErrorFull, Model
+):
+    pass
 
 
-class InstallPluginPackageInstallpluginpackageCloudUserErrorInlineFragment(Model):
-    typename: Literal["CloudUserError"] = Field(
-        alias="__typename", default="CloudUserError"
-    )
+class InstallPluginPackageInstallpluginpackageCloudUserErrorInlineFragment(
+    CloudUserErrorFull, Model
+):
+    pass
 
 
-class InstallPluginPackageInstallpluginpackageOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class InstallPluginPackageInstallpluginpackageOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class InstallPluginPackageInstallpluginpackage(Model):
@@ -2512,28 +2571,24 @@ class Projects(Model):
         document = "fragment ProjectFull on Project {\n  id\n  name\n  path\n  status\n  temporary\n  createdAt\n  updatedAt\n  version\n  size\n  readOnly\n  __typename\n}\n\nquery Projects {\n  projects {\n    ...ProjectFull\n    __typename\n  }\n}"
 
 
-class CreateProjectCreateprojectNameTakenUserErrorInlineFragment(Model):
-    typename: Literal["NameTakenUserError"] = Field(
-        alias="__typename", default="NameTakenUserError"
-    )
+class CreateProjectCreateprojectNameTakenUserErrorInlineFragment(
+    NameTakenUserErrorFull, Model
+):
+    pass
 
 
-class CreateProjectCreateprojectPermissionDeniedUserErrorInlineFragment(Model):
-    typename: Literal["PermissionDeniedUserError"] = Field(
-        alias="__typename", default="PermissionDeniedUserError"
-    )
+class CreateProjectCreateprojectPermissionDeniedUserErrorInlineFragment(
+    PermissionDeniedUserErrorFull, Model
+):
+    pass
 
 
-class CreateProjectCreateprojectCloudUserErrorInlineFragment(Model):
-    typename: Literal["CloudUserError"] = Field(
-        alias="__typename", default="CloudUserError"
-    )
+class CreateProjectCreateprojectCloudUserErrorInlineFragment(CloudUserErrorFull, Model):
+    pass
 
 
-class CreateProjectCreateprojectOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class CreateProjectCreateprojectOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
 class CreateProjectCreateproject(Model):
@@ -2570,22 +2625,20 @@ class CreateProject(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment CloudUserErrorFull on CloudUserError {\n  ...UserErrorFull\n  cloudReason: reason\n  __typename\n}\n\nfragment NameTakenUserErrorFull on NameTakenUserError {\n  ...UserErrorFull\n  name\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment PermissionDeniedUserErrorFull on PermissionDeniedUserError {\n  ...UserErrorFull\n  permissionReason: reason\n  __typename\n}\n\nfragment ProjectFull on Project {\n  id\n  name\n  path\n  status\n  temporary\n  createdAt\n  updatedAt\n  version\n  size\n  readOnly\n  __typename\n}\n\nmutation CreateProject($input: CreateProjectInput!) {\n  createProject(input: $input) {\n    error {\n      __typename\n      ... on NameTakenUserError {\n        ...NameTakenUserErrorFull\n      }\n      ... on PermissionDeniedUserError {\n        ...PermissionDeniedUserErrorFull\n      }\n      ... on CloudUserError {\n        ...CloudUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    project {\n      ...ProjectFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class DeleteProjectDeleteprojectProjectUserErrorInlineFragment(Model):
-    typename: Literal["ProjectUserError"] = Field(
-        alias="__typename", default="ProjectUserError"
-    )
+class DeleteProjectDeleteprojectProjectUserErrorInlineFragment(
+    ProjectUserErrorFull, Model
+):
+    pass
 
 
-class DeleteProjectDeleteprojectUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class DeleteProjectDeleteprojectUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class DeleteProjectDeleteprojectOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class DeleteProjectDeleteprojectOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
 class DeleteProjectDeleteproject(Model):
@@ -2687,22 +2740,20 @@ class SelectProjectSelectprojectCurrentproject(Model):
     project: ProjectFull
 
 
-class SelectProjectSelectprojectProjectUserErrorInlineFragment(Model):
-    typename: Literal["ProjectUserError"] = Field(
-        alias="__typename", default="ProjectUserError"
-    )
+class SelectProjectSelectprojectProjectUserErrorInlineFragment(
+    ProjectUserErrorFull, Model
+):
+    pass
 
 
-class SelectProjectSelectprojectUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class SelectProjectSelectprojectUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class SelectProjectSelectprojectOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class SelectProjectSelectprojectOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
 class SelectProjectSelectproject(Model):
@@ -3183,28 +3234,28 @@ class SetActiveReplaySessionEntry(Model):
         document = "fragment ReplaySessionMeta on ReplaySession {\n  id\n  name\n  collection {\n    id\n    __typename\n  }\n  activeEntry {\n    id\n    __typename\n  }\n  __typename\n}\n\nmutation SetActiveReplaySessionEntry($id: ID!, $entryId: ID!) {\n  setActiveReplaySessionEntry(id: $id, entryId: $entryId) {\n    session {\n      ...ReplaySessionMeta\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class StartReplayTaskStartreplaytaskCloudUserErrorInlineFragment(Model):
-    typename: Literal["CloudUserError"] = Field(
-        alias="__typename", default="CloudUserError"
-    )
+class StartReplayTaskStartreplaytaskCloudUserErrorInlineFragment(
+    CloudUserErrorFull, Model
+):
+    pass
 
 
-class StartReplayTaskStartreplaytaskPermissionDeniedUserErrorInlineFragment(Model):
-    typename: Literal["PermissionDeniedUserError"] = Field(
-        alias="__typename", default="PermissionDeniedUserError"
-    )
+class StartReplayTaskStartreplaytaskPermissionDeniedUserErrorInlineFragment(
+    PermissionDeniedUserErrorFull, Model
+):
+    pass
 
 
-class StartReplayTaskStartreplaytaskTaskInProgressUserErrorInlineFragment(Model):
-    typename: Literal["TaskInProgressUserError"] = Field(
-        alias="__typename", default="TaskInProgressUserError"
-    )
+class StartReplayTaskStartreplaytaskTaskInProgressUserErrorInlineFragment(
+    TaskInProgressUserErrorFull, Model
+):
+    pass
 
 
-class StartReplayTaskStartreplaytaskOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class StartReplayTaskStartreplaytaskOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class StartReplayTaskStartreplaytask(Model):
@@ -3327,7 +3378,7 @@ class Requests(Model):
         after: Optional[str] = Field(default=None)
         last: Optional[int] = Field(default=None)
         before: Optional[str] = Field(default=None)
-        filter: Optional[str] = Field(default=None)
+        filter: Optional[HTTPQLInput] = Field(default=None)
         order: Optional[RequestResponseOrderInput] = Field(default=None)
         scopeId: Optional[str] = Field(default=None)
         includeRequestRaw: bool
@@ -3337,7 +3388,7 @@ class Requests(Model):
     class Meta:
         """Meta class for Requests"""
 
-        document = "fragment ResponseFull on Response {\n  id\n  statusCode\n  roundtripTime\n  length\n  createdAt\n  raw @include(if: $includeResponseRaw)\n  __typename\n}\n\nfragment RequestFull on Request {\n  id\n  host\n  port\n  method\n  path\n  query\n  isTls\n  metadata {\n    id\n    color\n    __typename\n  }\n  createdAt\n  raw @include(if: $includeRequestRaw)\n  response {\n    ...ResponseFull\n    __typename\n  }\n  __typename\n}\n\nquery Requests($first: Int, $after: String, $last: Int, $before: String, $filter: HTTPQL, $order: RequestResponseOrderInput, $scopeId: ID, $includeRequestRaw: Boolean!, $includeResponseRaw: Boolean!) {\n  requests(\n    first: $first\n    after: $after\n    last: $last\n    before: $before\n    filter: $filter\n    order: $order\n    scopeId: $scopeId\n  ) {\n    edges {\n      cursor\n      node {\n        ...RequestFull\n        __typename\n      }\n      __typename\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n      __typename\n    }\n    __typename\n  }\n}"
+        document = "fragment ResponseFull on Response {\n  id\n  statusCode\n  roundtripTime\n  length\n  createdAt\n  raw @include(if: $includeResponseRaw)\n  __typename\n}\n\nfragment RequestFull on Request {\n  id\n  host\n  port\n  method\n  path\n  query\n  isTls\n  metadata {\n    id\n    color\n    __typename\n  }\n  createdAt\n  raw @include(if: $includeRequestRaw)\n  response {\n    ...ResponseFull\n    __typename\n  }\n  __typename\n}\n\nquery Requests($first: Int, $after: String, $last: Int, $before: String, $filter: HTTPQLInput, $order: RequestResponseOrderInput, $scopeId: ID, $includeRequestRaw: Boolean!, $includeResponseRaw: Boolean!) {\n  requests(\n    first: $first\n    after: $after\n    last: $last\n    before: $before\n    filter: $filter\n    order: $order\n    scopeId: $scopeId\n  ) {\n    edges {\n      cursor\n      node {\n        ...RequestFull\n        __typename\n      }\n      __typename\n    }\n    pageInfo {\n      hasNextPage\n      hasPreviousPage\n      startCursor\n      endCursor\n      __typename\n    }\n    __typename\n  }\n}"
 
 
 class Scopes(Model):
@@ -3373,16 +3424,14 @@ class Scope(Model):
         document = "fragment ScopeFull on Scope {\n  id\n  name\n  allowlist\n  denylist\n  indexed\n  __typename\n}\n\nquery Scope($id: ID!) {\n  scope(id: $id) {\n    ...ScopeFull\n    __typename\n  }\n}"
 
 
-class CreateScopeCreatescopeInvalidGlobTermsUserErrorInlineFragment(Model):
-    typename: Literal["InvalidGlobTermsUserError"] = Field(
-        alias="__typename", default="InvalidGlobTermsUserError"
-    )
+class CreateScopeCreatescopeInvalidGlobTermsUserErrorInlineFragment(
+    InvalidGlobTermsUserErrorFull, Model
+):
+    pass
 
 
-class CreateScopeCreatescopeOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class CreateScopeCreatescopeOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
 class CreateScopeCreatescope(Model):
@@ -3417,16 +3466,14 @@ class CreateScope(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment InvalidGlobTermsUserErrorFull on InvalidGlobTermsUserError {\n  ...UserErrorFull\n  terms\n  __typename\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment ScopeFull on Scope {\n  id\n  name\n  allowlist\n  denylist\n  indexed\n  __typename\n}\n\nmutation CreateScope($input: CreateScopeInput!) {\n  createScope(input: $input) {\n    error {\n      __typename\n      ... on InvalidGlobTermsUserError {\n        ...InvalidGlobTermsUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n    }\n    scope {\n      ...ScopeFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class UpdateScopeUpdatescopeInvalidGlobTermsUserErrorInlineFragment(Model):
-    typename: Literal["InvalidGlobTermsUserError"] = Field(
-        alias="__typename", default="InvalidGlobTermsUserError"
-    )
+class UpdateScopeUpdatescopeInvalidGlobTermsUserErrorInlineFragment(
+    InvalidGlobTermsUserErrorFull, Model
+):
+    pass
 
 
-class UpdateScopeUpdatescopeOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class UpdateScopeUpdatescopeOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
 class UpdateScopeUpdatescope(Model):
@@ -3500,6 +3547,16 @@ class TasksTasksBaseDataExportTask(TaskMetaDataExportTask, TasksTasksBase, Model
     )
 
 
+class TasksTasksBaseDeleteStreamWsMessageTask(
+    TaskMetaDeleteStreamWsMessageTask, TasksTasksBase, Model
+):
+    """No documentation"""
+
+    typename: Literal["DeleteStreamWsMessageTask"] = Field(
+        alias="__typename", default="DeleteStreamWsMessageTask"
+    )
+
+
 class TasksTasksBaseReplayTask(TaskMetaReplayTask, TasksTasksBase, Model):
     """No documentation"""
 
@@ -3528,6 +3585,7 @@ class Tasks(Model):
             Annotated[
                 Union[
                     TasksTasksBaseDataExportTask,
+                    TasksTasksBaseDeleteStreamWsMessageTask,
                     TasksTasksBaseReplayTask,
                     TasksTasksBaseWorkflowTask,
                 ],
@@ -3548,16 +3606,14 @@ class Tasks(Model):
         document = "fragment ReplayTaskMeta on ReplayTask {\n  ...TaskMeta\n  replayEntry {\n    id\n    __typename\n  }\n  __typename\n}\n\nfragment TaskMeta on Task {\n  __typename\n  id\n  createdAt\n}\n\nquery Tasks {\n  tasks {\n    ...TaskMeta\n    ... on ReplayTask {\n      ...ReplayTaskMeta\n    }\n    __typename\n  }\n}"
 
 
-class cancelTaskCanceltaskUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class cancelTaskCanceltaskUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class cancelTaskCanceltaskOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class cancelTaskCanceltaskOtherUserErrorInlineFragment(OtherUserErrorFull, Model):
+    pass
 
 
 class cancelTaskCanceltask(Model):
@@ -3603,6 +3659,16 @@ class FinishedTaskFinishedtaskTaskBaseDataExportTask(
 
     typename: Literal["DataExportTask"] = Field(
         alias="__typename", default="DataExportTask"
+    )
+
+
+class FinishedTaskFinishedtaskTaskBaseDeleteStreamWsMessageTask(
+    TaskMetaDeleteStreamWsMessageTask, FinishedTaskFinishedtaskTaskBase, Model
+):
+    """No documentation"""
+
+    typename: Literal["DeleteStreamWsMessageTask"] = Field(
+        alias="__typename", default="DeleteStreamWsMessageTask"
     )
 
 
@@ -3922,6 +3988,7 @@ class FinishedTaskFinishedtask(Model):
         Annotated[
             Union[
                 FinishedTaskFinishedtaskTaskBaseDataExportTask,
+                FinishedTaskFinishedtaskTaskBaseDeleteStreamWsMessageTask,
                 FinishedTaskFinishedtaskTaskBaseReplayTask,
                 FinishedTaskFinishedtaskTaskBaseWorkflowTask,
             ],
@@ -4100,22 +4167,22 @@ class Workflow(Model):
         document = "fragment WorkflowFull on Workflow {\n  id\n  name\n  kind\n  definition\n  enabled\n  global\n  readOnly\n  createdAt\n  updatedAt\n  __typename\n}\n\nquery Workflow($id: ID!) {\n  workflow(id: $id) {\n    ...WorkflowFull\n    __typename\n  }\n}"
 
 
-class CreateWorkflowCreateworkflowWorkflowUserErrorInlineFragment(Model):
-    typename: Literal["WorkflowUserError"] = Field(
-        alias="__typename", default="WorkflowUserError"
-    )
+class CreateWorkflowCreateworkflowWorkflowUserErrorInlineFragment(
+    WorkflowUserErrorFull, Model
+):
+    pass
 
 
-class CreateWorkflowCreateworkflowOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class CreateWorkflowCreateworkflowOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
-class CreateWorkflowCreateworkflowPermissionDeniedUserErrorInlineFragment(Model):
-    typename: Literal["PermissionDeniedUserError"] = Field(
-        alias="__typename", default="PermissionDeniedUserError"
-    )
+class CreateWorkflowCreateworkflowPermissionDeniedUserErrorInlineFragment(
+    PermissionDeniedUserErrorFull, Model
+):
+    pass
 
 
 class CreateWorkflowCreateworkflow(Model):
@@ -4151,28 +4218,28 @@ class CreateWorkflow(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment PermissionDeniedUserErrorFull on PermissionDeniedUserError {\n  ...UserErrorFull\n  permissionReason: reason\n  __typename\n}\n\nfragment WorkflowFull on Workflow {\n  id\n  name\n  kind\n  definition\n  enabled\n  global\n  readOnly\n  createdAt\n  updatedAt\n  __typename\n}\n\nfragment WorkflowUserErrorFull on WorkflowUserError {\n  ...UserErrorFull\n  node\n  message\n  reason\n  __typename\n}\n\nmutation CreateWorkflow($input: CreateWorkflowInput!) {\n  createWorkflow(input: $input) {\n    error {\n      __typename\n      ... on WorkflowUserError {\n        ...WorkflowUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n      ... on PermissionDeniedUserError {\n        ...PermissionDeniedUserErrorFull\n      }\n    }\n    workflow {\n      ...WorkflowFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class UpdateWorkflowUpdateworkflowUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class UpdateWorkflowUpdateworkflowUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class UpdateWorkflowUpdateworkflowWorkflowUserErrorInlineFragment(Model):
-    typename: Literal["WorkflowUserError"] = Field(
-        alias="__typename", default="WorkflowUserError"
-    )
+class UpdateWorkflowUpdateworkflowWorkflowUserErrorInlineFragment(
+    WorkflowUserErrorFull, Model
+):
+    pass
 
 
-class UpdateWorkflowUpdateworkflowOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class UpdateWorkflowUpdateworkflowOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
-class UpdateWorkflowUpdateworkflowReadOnlyUserErrorInlineFragment(Model):
-    typename: Literal["ReadOnlyUserError"] = Field(
-        alias="__typename", default="ReadOnlyUserError"
-    )
+class UpdateWorkflowUpdateworkflowReadOnlyUserErrorInlineFragment(
+    ReadOnlyUserErrorFull, Model
+):
+    pass
 
 
 class UpdateWorkflowUpdateworkflow(Model):
@@ -4210,22 +4277,22 @@ class UpdateWorkflow(Model):
         document = "fragment UserErrorFull on UserError {\n  __typename\n  code\n}\n\nfragment OtherUserErrorFull on OtherUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment ReadOnlyUserErrorFull on ReadOnlyUserError {\n  ...UserErrorFull\n  __typename\n}\n\nfragment UnknownIdUserErrorFull on UnknownIdUserError {\n  ...UserErrorFull\n  id\n  __typename\n}\n\nfragment WorkflowFull on Workflow {\n  id\n  name\n  kind\n  definition\n  enabled\n  global\n  readOnly\n  createdAt\n  updatedAt\n  __typename\n}\n\nfragment WorkflowUserErrorFull on WorkflowUserError {\n  ...UserErrorFull\n  node\n  message\n  reason\n  __typename\n}\n\nmutation UpdateWorkflow($id: ID!, $input: UpdateWorkflowInput!) {\n  updateWorkflow(id: $id, input: $input) {\n    error {\n      __typename\n      ... on UnknownIdUserError {\n        ...UnknownIdUserErrorFull\n      }\n      ... on WorkflowUserError {\n        ...WorkflowUserErrorFull\n      }\n      ... on OtherUserError {\n        ...OtherUserErrorFull\n      }\n      ... on ReadOnlyUserError {\n        ...ReadOnlyUserErrorFull\n      }\n    }\n    workflow {\n      ...WorkflowFull\n      __typename\n    }\n    __typename\n  }\n}"
 
 
-class DeleteWorkflowDeleteworkflowUnknownIdUserErrorInlineFragment(Model):
-    typename: Literal["UnknownIdUserError"] = Field(
-        alias="__typename", default="UnknownIdUserError"
-    )
+class DeleteWorkflowDeleteworkflowUnknownIdUserErrorInlineFragment(
+    UnknownIdUserErrorFull, Model
+):
+    pass
 
 
-class DeleteWorkflowDeleteworkflowReadOnlyUserErrorInlineFragment(Model):
-    typename: Literal["ReadOnlyUserError"] = Field(
-        alias="__typename", default="ReadOnlyUserError"
-    )
+class DeleteWorkflowDeleteworkflowReadOnlyUserErrorInlineFragment(
+    ReadOnlyUserErrorFull, Model
+):
+    pass
 
 
-class DeleteWorkflowDeleteworkflowOtherUserErrorInlineFragment(Model):
-    typename: Literal["OtherUserError"] = Field(
-        alias="__typename", default="OtherUserError"
-    )
+class DeleteWorkflowDeleteworkflowOtherUserErrorInlineFragment(
+    OtherUserErrorFull, Model
+):
+    pass
 
 
 class DeleteWorkflowDeleteworkflow(Model):
@@ -4262,8 +4329,10 @@ class DeleteWorkflow(Model):
 
 
 CreateEnvironmentInput.model_rebuild()
+CreateFilterPresetInput.model_rebuild()
 CreateReplaySessionInput.model_rebuild()
 InstallPluginPackageInput.model_rebuild()
+QueryInput.model_rebuild()
 ReplayEntrySettingsInput.model_rebuild()
 ReplayPlaceholderInput.model_rebuild()
 ReplayPreprocessorInput.model_rebuild()

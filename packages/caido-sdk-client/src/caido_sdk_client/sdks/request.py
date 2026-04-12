@@ -8,6 +8,7 @@ from caido_sdk_client.convert.connection import map_to_page_info
 from caido_sdk_client.convert.request import map_to_request_response_opt
 from caido_sdk_client.graphql import GraphQLClient
 from caido_sdk_client.graphql.__generated__.schema import (
+    HTTPQLInput,
     Ordering,
     Request,
     RequestResponseOrderBy,
@@ -22,7 +23,7 @@ from caido_sdk_client.types.request import (
     RequestGetOptions,
     RequestResponseOpt,
 )
-from caido_sdk_client.types.strings import Cursor, Httpql, IdLike
+from caido_sdk_client.types.strings import Cursor, HttpqlLike, IdLike
 from caido_sdk_client.utils.list import ListBuilder, ListBuilderVars
 
 # Request order field (req) -> GraphQL enum
@@ -46,7 +47,7 @@ _RESP_ORDER_BY: dict[str, RequestResponseOrderBy] = {
 
 
 class RequestsListBuilder(
-    ListBuilder[RequestResponseOpt, Httpql, RequestResponseOrderInput]
+    ListBuilder[RequestResponseOpt, HttpqlLike, RequestResponseOrderInput]
 ):
     """List builder for requests."""
 
@@ -120,8 +121,13 @@ class RequestsListBuilder(
 
     async def _query(
         self,
-        vars: ListBuilderVars[Httpql, RequestResponseOrderInput],
+        vars: ListBuilderVars[HttpqlLike, RequestResponseOrderInput],
     ) -> ConnectionQueryResult[RequestResponseOpt]:
+        filter_var = (
+            HTTPQLInput(code=str(vars.filter)).model_dump(mode="json")
+            if vars.filter is not None
+            else None
+        )
         raw = await self._graphql.query(
             Requests.Meta.document,
             variables={
@@ -129,7 +135,7 @@ class RequestsListBuilder(
                 "after": vars.after,
                 "last": vars.last,
                 "before": vars.before,
-                "filter": vars.filter,
+                "filter": filter_var,
                 "order": (
                     vars.order.model_dump(by_alias=True)
                     if vars.order is not None

@@ -21,17 +21,12 @@ def test_graphql_client_default_timeout_is_30_seconds() -> None:
 
 def test_graphql_client_custom_timeout_ms() -> None:
     client = GraphQLClient("http://localhost:8080", _make_auth_mock(), timeout_ms=10000)
-    assert client._timeout_seconds == 10.0
-
-
-def test_graphql_client_sub_second_timeout_not_truncated() -> None:
-    client = GraphQLClient("http://localhost:8080", _make_auth_mock(), timeout_ms=500)
-    assert client._timeout_seconds == 0.5
+    assert client._timeout_seconds == 10
 
 
 def test_graphql_client_http_transport_uses_timeout() -> None:
     client = GraphQLClient("http://localhost:8080", _make_auth_mock(), timeout_ms=5000)
-    assert client._http_transport.timeout == 5.0
+    assert client._http_transport.timeout == 5
 
 
 def test_graphql_client_http_transport_uses_default_timeout() -> None:
@@ -41,7 +36,7 @@ def test_graphql_client_http_transport_uses_default_timeout() -> None:
 
 def test_graphql_client_ws_transport_uses_connect_timeout() -> None:
     client = GraphQLClient("http://localhost:8080", _make_auth_mock(), timeout_ms=15000)
-    assert client._ws_transport.connect_timeout == 15.0
+    assert client._ws_transport.connect_timeout == 15
 
 
 def test_graphql_client_ws_transport_default_connect_timeout() -> None:

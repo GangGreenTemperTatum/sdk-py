@@ -159,11 +159,11 @@ wheels = [
 
 [[package]]
 name = "caido-schema-proxy"
-version = "0.55.3"
+version = "0.56.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/04/90/f874aacfbd442256a0267a9413ae3d7fc668eb04c0f15de5c59e7312bc4f/caido_schema_proxy-0.55.3.tar.gz", hash = "sha256:89bd1bb152d0e8f8572af4890883f5edcf0d2c4a6f42289df630f1aacc1401ea", size = 19436, upload-time = "2026-03-15T00:30:37.598Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/77/32/31ac105e8ed919bbaa53fe8e6521be338f8ea7d3259603f6a437ae4420cf/caido_schema_proxy-0.56.0.tar.gz", hash = "sha256:c1a0b8fe89a7d1d7b692796728f37a5a92ed0a3eb79de5dfedbfee5ee3ddf94a", size = 19631, upload-time = "2026-04-12T18:56:18.32Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/0b/da6f4e1bc6a96ef9f6f18e4c6d054eca8de94fddc0009120e40f98a0af84/caido_schema_proxy-0.55.3-py3-none-any.whl", hash = "sha256:f1e6a250fa113acc5ef8b7f887f64d6cc34fcd6577ed10c515c6c101c19005d6", size = 20091, upload-time = "2026-03-15T00:30:36.602Z" },
+    { url = "https://files.pythonhosted.org/packages/34/0c/f9283de4579cbc9fc38ec26b5ebbf6965fac58812eb190f39dd20d044291/caido_schema_proxy-0.56.0-py3-none-any.whl", hash = "sha256:21be351008d6fd1c18add25e569bedb0f4540debb128fbb85ea2cfa4b970bd38", size = 20271, upload-time = "2026-04-12T18:56:17.276Z" },
 ]
 
 [[package]]
@@ -192,7 +192,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "caido-schema-proxy", specifier = ">=0.55.3" },
+    { name = "caido-schema-proxy", specifier = ">=0.56.0" },
     { name = "pytest", specifier = ">=8.0.0" },
     { name = "pytest-asyncio", specifier = ">=0.24.0" },
 ]
@@ -218,7 +218,7 @@ dev = [
     { name = "pytest", specifier = ">=8.0.0" },
     { name = "pytest-asyncio", specifier = ">=0.24.0" },
     { name = "ruff", specifier = "==0.15.5" },
-    { name = "turms", specifier = ">=0.10.1" },
+    { name = "turms", git = "https://github.com/caido/dependency-turms.git?branch=caido" },
     { name = "ty", specifier = "==0.0.22" },
 ]
 
@@ -953,7 +953,7 @@ wheels = [
 [[package]]
 name = "turms"
 version = "0.10.1"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/caido/dependency-turms.git?branch=caido#84b70a8a9c22cffb976c2143d27d518ac293d462" }
 dependencies = [
     { name = "graphql-core" },
     { name = "pydantic" },
@@ -963,10 +963,6 @@ dependencies = [
     { name = "rich" },
     { name = "rich-click" },
     { name = "watchfiles" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/93/2a51e5fc4b4a78a81c1320ae19507a88592f7fa4a1f4806c98add07eaccf/turms-0.10.1.tar.gz", hash = "sha256:98d8fbf32958ce5fe1c3b29c0f4bfbc53d7bd3a442f8e0ac6f713c5fb9a0a894", size = 56102, upload-time = "2025-10-29T20:12:24.406Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d6/03/6e66cb20525aa1101d2ecb76ebafbc25425b7f8ebd63f76396b17cebb137/turms-0.10.1-py3-none-any.whl", hash = "sha256:52037684447245055220e6236ecf64826d54c084ca5fa7cd1ca3ebd6eb1e4b19", size = 70996, upload-time = "2025-10-29T20:12:23.063Z" },
 ]
 
 [[package]]
