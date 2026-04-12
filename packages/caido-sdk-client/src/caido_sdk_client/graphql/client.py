@@ -22,7 +22,7 @@ from caido_sdk_client.errors.graphql import (
     NoDataUserError,
     OperationUserError,
 )
-from caido_sdk_client.graphql.utils import to_user_error
+from caido_sdk_client.graphql.utils import has_authorization_error, to_user_error
 
 if TYPE_CHECKING:
     from caido_sdk_client.auth.manager import AuthManager
@@ -43,9 +43,7 @@ class GraphQLClient:
         self._graphql_url = f"{normalized_url}/graphql"
         self._websocket_url = self._to_websocket_url(normalized_url)
         self._static_headers = dict(headers) if headers is not None else {}
-        self._timeout_seconds = (
-            int(timeout_ms / 1000) if timeout_ms is not None else None
-        )
+        self._timeout_seconds = int(timeout_ms / 1000) if timeout_ms is not None else 30
         self._auth = auth
 
         self._http_transport, self._http_client = self._create_http_client()
@@ -78,6 +76,7 @@ class GraphQLClient:
         transport = WebsocketsTransport(
             url=self._websocket_url,
             init_payload=init_payload,
+            connect_timeout=self._timeout_seconds,
             close_timeout=2,
         )
         client = Client(
@@ -137,6 +136,7 @@ class GraphQLClient:
         variables: Mapping[str, Any] | None,
         *,
         upload_files: bool = False,
+        _retried: bool = False,
     ) -> dict[str, Any]:
         try:
             request = self._request(
@@ -148,6 +148,16 @@ class GraphQLClient:
                 upload_files=upload_files,
             )
         except TransportQueryError as exc:
+            if (
+                not _retried
+                and exc.errors
+                and has_authorization_error(exc.errors)
+                and self._auth.can_refresh()
+            ):
+                await self._auth.refresh()
+                return await self._execute(
+                    document, variables, upload_files=upload_files, _retried=True
+                )
             self._raise_from_query_error(exc)
         except TransportError as exc:
             raise NetworkUserError().with_source(exc) from exc

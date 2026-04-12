@@ -8,6 +8,8 @@ members = ["packages/*"]
 
 [tool.uv.sources]
 caido-server-auth = { workspace = true }
+# Fork includes fixes on top of upstream turms; see https://github.com/caido/dependency-turms/tree/caido
+turms = { git = "https://github.com/caido/dependency-turms.git", branch = "caido" }
 
 [dependency-groups]
 dev = [

@@ -30,7 +30,8 @@ Mirror the JS `src/` layout as closely as possible:
 
 **NEVER modify files under `graphql/__generated__/`.**
 These are produced by turms from `.graphql` documents and `schema.graphql`.
-To regenerate, run `uv run turms gen` from the `packages/caido-sdk-client` directory.
+To regenerate, run `mise run generate` from the repository root (it links `schema.graphql` from `caido-schema-proxy` and runs turms in `packages/caido-sdk-client`).
+The workspace resolves **turms** from Caido’s fork ([`caido/dependency-turms`](https://github.com/caido/dependency-turms) branch `caido`) via `[tool.uv.sources]` in the root `pyproject.toml`, not from PyPI.
 Turms requires fragments to be referenced by at least one operation; standalone fragment-only documents won't pass validation.
 
 The `schema.graphql` file comes from the JS SDK's `node_modules/@caido/schema-proxy/schema.graphql`.

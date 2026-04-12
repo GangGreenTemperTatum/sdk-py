@@ -22,3 +22,6 @@ class CloudUserError(BaseError):
                     "An unknown error occured while communicating with Caido cloud"
                 )
                 self.reason = error.cloudReason
+            case _:
+                super().__init__(f"Cloud error: {error.cloudReason}")
+                self.reason = error.cloudReason

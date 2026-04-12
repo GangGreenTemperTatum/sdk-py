@@ -37,7 +37,7 @@ jobs:
         run: uv sync --all-packages --group dev
 
       - name: Run sdk-client tests
-        run: uv run pytest packages/caido-sdk-client/tests -v -p no:xdist
+        run: uv run pytest packages/caido-sdk-client -v -p no:xdist
         env:
           CAIDO_PAT: ${{ secrets.CAIDO_PAT }}
           CAIDO_INSTANCE_URL: http://localhost:8080

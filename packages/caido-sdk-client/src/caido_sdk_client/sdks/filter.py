@@ -12,6 +12,9 @@ from caido_sdk_client.graphql.__generated__.schema import (
     CreateFilterPreset,
     DeleteFilterPreset,
     FilterPresets,
+    HTTPQLInput,
+    QueryInput,
+    StreamQLInput,
     UpdateFilterPreset,
 )
 from caido_sdk_client.graphql.__generated__.schema import (
@@ -19,11 +22,24 @@ from caido_sdk_client.graphql.__generated__.schema import (
 )
 from caido_sdk_client.types import (
     CreateFilterPresetOptions,
+    FilterClauseKind,
     FilterPreset,
     UpdateFilterPresetOptions,
 )
 from caido_sdk_client.types.strings import IdLike
 from caido_sdk_client.utils.errors import handle_graphql_error
+
+
+def _options_clause_to_query_input(
+    options: CreateFilterPresetOptions | UpdateFilterPresetOptions,
+) -> dict[str, object]:
+    code = str(options.clause)
+    match options.kind or FilterClauseKind.HTTPQL:
+        case FilterClauseKind.HTTPQL:
+            payload = QueryInput(HTTPQL=HTTPQLInput(code=code))
+        case FilterClauseKind.StreamQL:
+            payload = QueryInput(streamQL=StreamQLInput(code=code))
+    return payload.model_dump(mode="json", exclude_none=True)
 
 
 class FilterSDK:
@@ -57,7 +73,7 @@ class FilterSDK:
                 "input": {
                     "name": options.name,
                     "alias": options.alias,
-                    "clause": options.clause,
+                    "clause": _options_clause_to_query_input(options),
                 },
             },
         )
@@ -85,7 +101,7 @@ class FilterSDK:
                 "input": {
                     "name": options.name,
                     "alias": options.alias,
-                    "clause": options.clause,
+                    "clause": _options_clause_to_query_input(options),
                 },
             },
         )
