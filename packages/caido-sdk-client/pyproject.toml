@@ -1,6 +1,6 @@
 [project]
 name = "caido-sdk-client"
-version = "0.2.0"
+version = "0.3.0"
 description = "Client SDK for interacting with a Caido instance"
 readme = "README.md"
 authors = [{ name = "Caido Labs Inc.", email = "dev@caido.io" }]
@@ -19,12 +19,7 @@ schema-latest = ["caido-schema-proxy>=0.57.0"]
 schema-v0-56 = ["caido-schema-proxy==0.56.0"]
 
 [tool.uv]
-conflicts = [
-  [
-    { group = "schema-latest" },
-    { group = "schema-v0-56" },
-  ],
-]
+conflicts = [[{ group = "schema-latest" }, { group = "schema-v0-56" }]]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
