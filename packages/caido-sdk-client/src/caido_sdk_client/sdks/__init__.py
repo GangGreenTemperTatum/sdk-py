@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from .certificate import CertificateSDK
+from .dns_rewrite import DNSRewriteSDK
+from .dns_upstream import DNSUpstreamSDK
 from .environment import EnvironmentInstance, EnvironmentSDK
 from .filter import FilterSDK
 from .finding import FindingSDK, FindingsListBuilder
@@ -16,7 +19,7 @@ from .replay_collection import (
     ReplayCollectionsListBuilder,
     ReplaySessionCollection,
 )
-from .replay_entry import ReplayEntrySDK
+from .replay_entry import ReplayEntry, ReplayEntrySDK
 from .replay_session import (
     ReplaySession,
     ReplaySessionEntriesListBuilder,
@@ -25,11 +28,14 @@ from .replay_session import (
 )
 from .request import RequestSDK, RequestsListBuilder
 from .scope import ScopeSDK
-from .task import ReplayTask, Task, TaskSDK
+from .task import ReplayTask, Task, TaskSDK, WorkflowTask
 from .user import UserSDK
 from .workflow import WorkflowSDK
 
 __all__ = [
+    "CertificateSDK",
+    "DNSRewriteSDK",
+    "DNSUpstreamSDK",
     "EnvironmentInstance",
     "EnvironmentSDK",
     "FilterSDK",
@@ -43,6 +49,7 @@ __all__ = [
     "ProjectSDK",
     "ReplayCollectionSDK",
     "ReplayCollectionsListBuilder",
+    "ReplayEntry",
     "ReplayEntrySDK",
     "ReplaySDK",
     "ReplaySession",
@@ -58,4 +65,5 @@ __all__ = [
     "TaskSDK",
     "UserSDK",
     "WorkflowSDK",
+    "WorkflowTask",
 ]

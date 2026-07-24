@@ -2,7 +2,16 @@
 
 from __future__ import annotations
 
+from .certificate import CertificateFileLike, ImportCertificateOptions
 from .connection import Connection, Edge, PageInfo
+from .dns_rewrite import (
+    CreateDNSRewriteOptions,
+    DNSIPResolver,
+    DNSResolver,
+    DNSRewrite,
+    DNSUpstreamResolver,
+)
+from .dns_upstream import CreateDNSUpstreamOptions, DNSUpstream
 from .environment import (
     CreateEnvironmentOptions,
     Environment,
@@ -44,7 +53,6 @@ from .plugin import (
 )
 from .project import CreateProjectOptions, Project, ProjectStatus
 from .replay_collection import CreateReplaySessionCollectionOptions
-from .replay_entry import ReplayEntry
 from .replay_session import (
     CreateReplaySessionFromId,
     CreateReplaySessionFromRaw,
@@ -63,6 +71,7 @@ from .request import (
     Response,
 )
 from .scope import CreateScopeOptions, Scope, UpdateScopeOptions
+from .semver import SemverLiteral
 from .strings import Cursor, CursorLike, Httpql, HttpqlLike, Id, IdLike
 from .task import TaskResult, TaskStatus
 from .user import (
@@ -76,8 +85,19 @@ from .user import (
     UserProfile,
     UserSubscription,
 )
+from .versioned import TransportVersion, Versioned, versioned
 from .workflow import (
     CreateWorkflowOptions,
+    RunActiveWorkflowOptions,
+    RunConvertWorkflowOptions,
+    RunConvertWorkflowResult,
+    TestWorkflowActiveOptions,
+    TestWorkflowConvertOptions,
+    TestWorkflowConvertResult,
+    TestWorkflowHttpResult,
+    TestWorkflowPassiveOptions,
+    TestWorkflowRequest,
+    TestWorkflowResponse,
     UpdateWorkflowOptions,
     Workflow,
 )
@@ -86,6 +106,15 @@ __all__ = [
     "AISettings",
     "AnalyticsSettings",
     "AnthropicAISetting",
+    "CertificateFileLike",
+    "ImportCertificateOptions",
+    "CreateDNSRewriteOptions",
+    "CreateDNSUpstreamOptions",
+    "DNSIPResolver",
+    "DNSResolver",
+    "DNSRewrite",
+    "DNSUpstream",
+    "DNSUpstreamResolver",
     "CloudUser",
     "Connection",
     "ConnectionInfo",
@@ -129,7 +158,6 @@ __all__ = [
     "Project",
     "ProjectStatus",
     "RangeInput",
-    "ReplayEntry",
     "ReplayPlaceholderInput",
     "ReplaySendOptions",
     "ReplaySendResult",
@@ -143,6 +171,7 @@ __all__ = [
     "CreateScopeOptions",
     "UpdateScopeOptions",
     "ScriptUser",
+    "SemverLiteral",
     "SetAISettingsInput",
     "SetAnalyticsSettingsInput",
     "SetInstanceSettingsInput",
@@ -160,6 +189,19 @@ __all__ = [
     "UserProfile",
     "UserSubscription",
     "CreateWorkflowOptions",
+    "RunActiveWorkflowOptions",
+    "RunConvertWorkflowOptions",
+    "RunConvertWorkflowResult",
+    "TestWorkflowActiveOptions",
+    "TestWorkflowConvertOptions",
+    "TestWorkflowConvertResult",
+    "TestWorkflowHttpResult",
+    "TestWorkflowPassiveOptions",
+    "TestWorkflowRequest",
+    "TestWorkflowResponse",
     "UpdateWorkflowOptions",
+    "TransportVersion",
+    "Versioned",
     "Workflow",
+    "versioned",
 ]
