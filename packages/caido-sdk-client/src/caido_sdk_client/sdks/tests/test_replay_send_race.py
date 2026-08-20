@@ -16,6 +16,7 @@ import asyncio
 from typing import Any
 
 import pytest
+
 from caido_sdk_client.sdks.replay import ReplaySDK
 from caido_sdk_client.types.network import ConnectionInfoInput
 from caido_sdk_client.types.replay_session import ReplaySendOptions

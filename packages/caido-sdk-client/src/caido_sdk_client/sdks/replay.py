@@ -18,8 +18,8 @@ from caido_sdk_client.sdks.task import ReplayTask, TaskSDK
 from caido_sdk_client.transport.latest.__generated__ import schema as latest
 from caido_sdk_client.transport.v0_56.__generated__ import schema as v0_56
 from caido_sdk_client.types.replay_session import ReplaySendOptions, ReplaySendResult
-from caido_sdk_client.types.task import TaskResult
 from caido_sdk_client.types.strings import IdLike
+from caido_sdk_client.types.task import TaskResult
 from caido_sdk_client.types.versioned import TransportVersion
 from caido_sdk_client.utils.errors import handle_graphql_error
 from caido_sdk_client.version import Version
