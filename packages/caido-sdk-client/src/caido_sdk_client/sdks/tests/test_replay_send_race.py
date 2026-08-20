@@ -13,10 +13,11 @@ subscribers that were already listening — exactly how a real broadcast works.
 from __future__ import annotations
 
 import asyncio
-from typing import Any
+from typing import Any, cast
 
 import pytest
 
+from caido_sdk_client.graphql import GraphQLClient
 from caido_sdk_client.sdks.replay import ReplaySDK
 from caido_sdk_client.types.network import ConnectionInfoInput
 from caido_sdk_client.types.replay_session import ReplaySendOptions
@@ -111,7 +112,9 @@ class FakeGraphQL:
 def _build_sdk(*, instant: bool) -> tuple[ReplaySDK, FakeBroadcast]:
     broadcast = FakeBroadcast()
     graphql = FakeGraphQL(broadcast, instant=instant)
-    sdk = ReplaySDK(graphql, Version.of(TransportVersion.V0_57.value))
+    sdk = ReplaySDK(
+        cast(GraphQLClient, graphql), Version.of(TransportVersion.V0_57.value)
+    )
 
     async def fake_get(_entry_id: Any) -> Any:
         class _Entry:
@@ -160,7 +163,7 @@ async def test_subscription_is_open_before_the_mutation_runs() -> None:
     sdk, broadcast = _build_sdk(instant=True)
     subscribers_at_start: list[int] = []
 
-    original = sdk._graphql.mutation  # type: ignore[attr-defined]
+    original = sdk._graphql.mutation
 
     async def spy(document: Any, *args: Any, **kwargs: Any) -> Any:
         # Only startReplayTask matters; the draft update legitimately runs
