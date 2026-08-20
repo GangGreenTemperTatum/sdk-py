@@ -27,6 +27,7 @@ asyncio_default_fixture_loop_scope = "session"
 testpaths = [
   "tests",
   "src/caido_sdk_client/graphql/tests",
+  "src/caido_sdk_client/sdks/tests",
   "src/caido_sdk_client/errors/tests",
 ]
 # Run tests one at a time (no parallel workers); integration tests share one Caido instance
